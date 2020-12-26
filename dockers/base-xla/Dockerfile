@@ -31,7 +31,7 @@ ENV CONDA_ENV=lightning
 # show system inforation
 RUN lsb_release -a && cat /etc/*-release
 
-RUN apt-get update && \
+RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
         build-essential \
         cmake \
@@ -97,6 +97,8 @@ RUN \
     python -c "fname = 'requirements.txt' ; lines = [line for line in open(fname).readlines() if not line.startswith('torch')] ; open(fname, 'w').writelines(lines)" && \
     # drop Horovod as it is not needed
     python -c "fname = 'requirements/extra.txt' ; lines = [line for line in open(fname).readlines() if not line.startswith('horovod')] ; open(fname, 'w').writelines(lines)" && \
+    # drop fairscale as it is not needed
+    python -c "fname = 'requirements/extra.txt' ; lines = [line for line in open(fname).readlines() if 'fairscale' not in line] ; open(fname, 'w').writelines(lines)" && \
     # drop TorchVision as it was installed with XLA
     python -c "fname = 'requirements/examples.txt' ; lines = [line for line in open(fname).readlines() if not line.startswith('torchvision')] ; open(fname, 'w').writelines(lines)" && \
     pip install --requirement ./requirements/devel.txt --upgrade-strategy only-if-needed && \
@@ -110,4 +112,4 @@ RUN \
     conda info && \
     pip list && \
     python -c "import sys; assert sys.version[:3] == '$PYTHON_VERSION', sys.version" && \
-    python -c "import torch; ver = '$XLA_VERSION' ; ver = dict(nightly='1.7').get(ver, ver) ; assert torch.__version__[:3] == ver, torch.__version__"
+    python -c "import torch; ver = '$XLA_VERSION' ; ver = dict(nightly='1.8').get(ver, ver) ; assert torch.__version__[:3] == ver, torch.__version__"

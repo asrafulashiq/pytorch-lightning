@@ -543,7 +543,7 @@ Or multiple nodes
 
     # (32 GPUs)
     model = LitMNIST()
-    trainer = Trainer(gpus=8, num_nodes=4, distributed_backend='ddp')
+    trainer = Trainer(gpus=8, num_nodes=4, accelerator='ddp')
     trainer.fit(model, train_loader)
 
 Refer to the :ref:`distributed computing guide for more details <multi_gpu>`.
@@ -601,8 +601,8 @@ In this method we do all the preparation we need to do once (instead of on every
         def setup(self, stage):
             # transform
             transform=transforms.Compose([transforms.ToTensor()])
-            MNIST(os.getcwd(), train=True, download=False, transform=transform)
-            MNIST(os.getcwd(), train=False, download=False, transform=transform)
+            mnist_train = MNIST(os.getcwd(), train=True, download=False, transform=transform)
+            mnist_test = MNIST(os.getcwd(), train=False, download=False, transform=transform)
 
             # train/val split
             mnist_train, mnist_val = random_split(mnist_train, [55000, 5000])
